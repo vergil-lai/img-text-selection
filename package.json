@@ -1,7 +1,22 @@
 {
     "name": "ocr-select-core",
-    "version": "0.1.1",
+    "version": "0.1.2",
+    "description": "Local browser OCR runtime with selectable text overlays powered by PP-OCRv6 Tiny.",
+    "keywords": [
+        "browser",
+        "ocr",
+        "onnx",
+        "pp-ocrv6",
+        "text-selection",
+        "wasm",
+        "webgpu"
+    ],
+    "homepage": "https://github.com/vergil-lai/ocr-select-core#readme",
+    "bugs": {
+        "url": "https://github.com/vergil-lai/ocr-select-core/issues"
+    },
     "license": "MIT",
+    "author": "Vergil Lai",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/vergil-lai/ocr-select-core.git"

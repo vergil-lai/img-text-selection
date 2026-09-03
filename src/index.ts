@@ -1,3 +1,4 @@
+import './style-types'
 import './style.css'
 
 import { OcrSelectRuntime } from './runtime'
