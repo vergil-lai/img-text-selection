@@ -10,6 +10,7 @@ function sample(source: ImageData, x: number, y: number, channel: number): numbe
     return source.data[(boundedY * source.width + boundedX) * 4 + channel]!
 }
 
+/** 将任意四边形文字框重采样为供识别模型使用的矩形图像。 */
 export function cropTextBox(source: ImageData, box: OcrBox): ImageData {
     const [topLeft, topRight, bottomRight, bottomLeft] = box
     const width = Math.max(
@@ -26,6 +27,7 @@ export function cropTextBox(source: ImageData, box: OcrBox): ImageData {
         const vertical = (y + 0.5) / height
         for (let x = 0; x < width; x += 1) {
             const horizontal = (x + 0.5) / width
+            // 对上下边插值后再纵向插值，完成四边形到矩形的双线性映射。
             const topX = topLeft[0] + (topRight[0] - topLeft[0]) * horizontal
             const topY = topLeft[1] + (topRight[1] - topLeft[1]) * horizontal
             const bottomX = bottomLeft[0] + (bottomRight[0] - bottomLeft[0]) * horizontal

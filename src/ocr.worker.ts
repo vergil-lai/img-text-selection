@@ -54,6 +54,7 @@ async function releaseSessions(): Promise<void> {
     await Promise.allSettled([current.detection.release(), current.recognition.release()])
 }
 
+/** 复用同一执行后端的模型会话，并在可用时优先选择 WebGPU。 */
 async function prepareSessions(assets: OcrWorkerAssets, forceWasm = false): Promise<SessionPair> {
     const key = forceWasm ? 'wasm' : 'auto'
     if (sessions?.key === key) return sessions
@@ -73,9 +74,11 @@ async function prepareSessions(assets: OcrWorkerAssets, forceWasm = false): Prom
     return sessions
 }
 
+/** 将 ONNX Runtime 会话适配为与模型运行时无关的流水线接口。 */
 class OrtSessionAdapter implements PipelineSession {
     constructor(private readonly session: ort.InferenceSession) {}
 
+    /** 执行模型并校验流水线所需的 float32 输出。 */
     async run(input: TensorInput) {
         const inputName = this.session.inputNames[0]
         const outputName = this.session.outputNames[0]
@@ -104,6 +107,7 @@ async function decodeImage(bytes: ArrayBuffer): Promise<ImageData> {
     }
 }
 
+/** 解码图片、执行 OCR 流水线并包装为主线程可消费的结果。 */
 async function execute(request: OcrWorkerRequest, forceWasm = false): Promise<OcrResult> {
     respond({ type: 'progress', taskId: request.taskId, stage: 'loading' })
     const image = await decodeImage(request.image)
@@ -129,6 +133,7 @@ async function execute(request: OcrWorkerRequest, forceWasm = false): Promise<Oc
     }
 }
 
+/** 识别请求；WebGPU 推理失败时自动以 WASM 重试。 */
 async function recognize(request: OcrWorkerRequest): Promise<void> {
     try {
         let result: OcrResult
@@ -138,6 +143,7 @@ async function recognize(request: OcrWorkerRequest): Promise<void> {
             const isSemanticFailure =
                 error instanceof Error && 'code' in error && error.code === 'no_reliable_text'
             if (sessions?.backend !== 'webgpu' || isSemanticFailure) throw error
+            // 仅将运行时失败回退到 WASM；无文本并非后端不兼容。
             await releaseSessions()
             result = await execute(request, true)
         }

@@ -14,6 +14,7 @@ interface DetectionMapOptions {
     unclipRatio?: number
 }
 
+/** 从检测概率图提取满足像素数与平均置信度阈值的文字框。 */
 export function extractTextBoxes(
     probabilities: Float32Array,
     shape: readonly number[],
@@ -37,6 +38,7 @@ export function extractTextBoxes(
         let maxX = 0
         let maxY = 0
         let score = 0
+        // 以八邻域泛洪填充同一块候选文字区域。
         while (cursor < queue.length) {
             const index = queue[cursor++]!
             const x = index % width

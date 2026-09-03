@@ -31,6 +31,7 @@ function left(line: OcrLine): number {
     return Math.min(...line.box.map((point) => point[0]))
 }
 
+/** 依次检测文字区域、识别每个区域，并按阅读顺序返回可靠文本行。 */
 export async function runOcrPipeline(
     image: ImageData,
     sessions: PipelineSessions,
@@ -58,6 +59,7 @@ export async function runOcrPipeline(
     progress.onStage?.('detecting', 1, 1)
 
     const lines: OcrLine[] = []
+    // 检测框逐个送入识别模型，便于报告细粒度进度。
     for (const [index, box] of boxes.entries()) {
         progress.onStage?.('recognizing', index, boxes.length)
         const crop = cropTextBox(image, box)

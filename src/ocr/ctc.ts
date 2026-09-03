@@ -3,6 +3,7 @@ export interface DecodedText {
     confidence: number
 }
 
+/** 将识别模型的 CTC logits 解码为文本，并合并连续的重复字符。 */
 export function decodeCtc(
     logits: Float32Array,
     shape: readonly number[],
@@ -23,6 +24,7 @@ export function decodeCtc(
         for (let candidate = 1; candidate < classes; candidate += 1) {
             if (logits[offset + candidate]! > logits[offset + selected]!) selected = candidate
         }
+        // CTC 的 0 为 blank；连续相同 token 只代表一个字符。
         if (selected !== 0 && selected !== previous) {
             const character = selected === dictionary.length + 1 ? ' ' : dictionary[selected - 1]
             if (character !== undefined) {

@@ -13,6 +13,7 @@ export interface IndexedTextLine extends TextLineInput {
     utf16Offsets: number[]
 }
 
+/** 将页面 OCR 行索引为字素簇，以正确处理 Unicode 文本选区。 */
 export class PageTextIndex {
     readonly #lines: IndexedTextLine[]
     readonly #byId: Map<string, IndexedTextLine>
@@ -30,12 +31,14 @@ export class PageTextIndex {
         this.#byId = new Map(this.#lines.map((line) => [line.id, line]))
     }
 
+    /** 按行 ID 获取已分词的文本行。 */
     line(id: string): IndexedTextLine {
         const line = this.#byId.get(id)
         if (!line) throw new RangeError(`Unknown text line: ${id}`)
         return line
     }
 
+    /** 将 DOM 的 UTF-16 偏移量映射为稳定的字素簇位置。 */
     positionAtUtf16(lineId: string, offset: number, affinity: 'start' | 'end'): TextPosition {
         const line = this.line(lineId)
         const bounded = Math.max(0, Math.min(offset, line.text.length))
@@ -49,6 +52,7 @@ export class PageTextIndex {
         }
     }
 
+    /** 返回按页面阅读顺序包含首尾位置的选中文本。 */
     textBetween(start: TextPosition, end: TextPosition): string {
         const startIndex = this.#lines.findIndex((line) => line.id === start.lineId)
         const endIndex = this.#lines.findIndex((line) => line.id === end.lineId)

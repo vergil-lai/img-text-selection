@@ -14,6 +14,7 @@ export interface ImageContentRect {
     height: number
 }
 
+/** 将 CSS `object-position` 关键字或百分比转换为定位比例。 */
 function positionFraction(value: string): number {
     if (value === 'left' || value === 'top') return 0
     if (value === 'right' || value === 'bottom') return 1
@@ -22,6 +23,7 @@ function positionFraction(value: string): number {
     return 0.5
 }
 
+/** 计算应用 `object-fit` 与 `object-position` 后图片实际内容的显示区域。 */
 export function calculateImageContentRect(input: ImageGeometryInput): ImageContentRect {
     if (input.objectFit === 'fill') {
         return { x: 0, y: 0, width: input.elementWidth, height: input.elementHeight }

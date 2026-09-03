@@ -39,6 +39,7 @@ interface RuntimeOptions {
     engine: OcrEngine
 }
 
+/** 生成可用于 OCR 结果缓存的图片内容标识。 */
 function identityOf(image: HTMLImageElement): string {
     return `${image.currentSrc || image.src}\u0000${image.naturalWidth}x${image.naturalHeight}`
 }
@@ -111,6 +112,7 @@ function addTextLayer(
     return selectableLayer
 }
 
+/** 按图片的 `object-fit` 布局同步 SVG 文本层的位置与尺寸。 */
 function positionTextLayer(layer: SVGSVGElement, image: HTMLImageElement, result: OcrResult): void {
     const style = getComputedStyle(image)
     const objectFit =
@@ -134,6 +136,7 @@ function positionTextLayer(layer: SVGSVGElement, image: HTMLImageElement, result
     layer.style.height = `${content.height}px`
 }
 
+/** 管理一张图片的 OCR 生命周期、文字图层和复制交互。 */
 export class OcrSelectBinding {
     #state: OcrSelectState = { status: 'idle' }
     #subscribers = new Set<(state: OcrSelectState) => void>()
@@ -155,16 +158,19 @@ export class OcrSelectBinding {
         image.addEventListener('load', this.#handleLoad)
     }
 
+    /** 获取当前识别与交互状态。 */
     get state(): OcrSelectState {
         return this.#state
     }
 
+    /** 订阅状态变化，并立即接收当前状态。 */
     subscribe(subscriber: (state: OcrSelectState) => void): () => void {
         this.#subscribers.add(subscriber)
         subscriber(this.#state)
         return () => this.#subscribers.delete(subscriber)
     }
 
+    /** 激活图片文字选择层；优先复用相同图片的缓存结果。 */
     async activate(): Promise<void> {
         if (this.#disposed) throw new Error('OCR binding has been disposed')
         this.runtime.beginActivation(this)
@@ -181,6 +187,7 @@ export class OcrSelectBinding {
         this.#setState({ status: 'recognizing' })
         try {
             const result = await this.runtime.recognize(this.image)
+            // 识别期间图片源或绑定状态变化时，丢弃过期的异步结果。
             if (
                 this.#disposed ||
                 generation !== this.#generation ||
@@ -197,6 +204,7 @@ export class OcrSelectBinding {
         }
     }
 
+    /** 移除文字图层并取消当前激活态。 */
     deactivate(): void {
         if (this.#disposed) return
         this.#generation += 1
@@ -205,6 +213,7 @@ export class OcrSelectBinding {
         this.runtime.endActivation(this)
     }
 
+    /** 解除图片事件、订阅和运行时关联。 */
     dispose(): void {
         if (this.#disposed) return
         this.deactivate()
@@ -350,6 +359,7 @@ export class OcrSelectBinding {
     }
 }
 
+/** 协调多个图片绑定、OCR 缓存及共享引擎的运行时。 */
 export class OcrSelectRuntime {
     readonly #engine: OcrEngine
     readonly #bindings = new Set<OcrSelectBinding>()
@@ -361,6 +371,7 @@ export class OcrSelectRuntime {
         this.#engine = options.engine
     }
 
+    /** 为图片创建独立的 OCR 绑定。 */
     attach(image: HTMLImageElement): OcrSelectBinding {
         if (this.#disposed) throw new Error('OCR runtime has been disposed')
         const binding = new OcrSelectBinding(this, image)
@@ -368,32 +379,39 @@ export class OcrSelectRuntime {
         return binding
     }
 
+    /** 激活一个绑定，并关闭此前处于激活态的绑定。 */
     beginActivation(binding: OcrSelectBinding): void {
         if (this.#active && this.#active !== binding) this.#active.deactivate()
         this.#active = binding
     }
 
+    /** 仅在当前绑定仍处于激活态时清除激活引用。 */
     endActivation(binding: OcrSelectBinding): void {
         if (this.#active === binding) this.#active = undefined
     }
 
+    /** 读取指定图片标识对应的已识别结果。 */
     cached(identity: string): OcrResult | undefined {
         return this.#cache.get(identity)
     }
 
+    /** 缓存指定图片标识的识别结果。 */
     cache(identity: string, result: OcrResult): void {
         this.#cache.set(identity, result)
     }
 
+    /** 委托共享引擎识别图片。 */
     recognize(image: HTMLImageElement): Promise<OcrResult> {
         return this.#engine.recognize(image)
     }
 
+    /** 移除已销毁的图片绑定及其激活引用。 */
     detach(binding: OcrSelectBinding): void {
         this.#bindings.delete(binding)
         this.endActivation(binding)
     }
 
+    /** 销毁所有绑定、缓存及底层 OCR 引擎。 */
     async dispose(): Promise<void> {
         if (this.#disposed) return
         this.#disposed = true

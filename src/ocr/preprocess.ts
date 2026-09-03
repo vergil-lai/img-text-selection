@@ -20,6 +20,7 @@ function clamp(value: number, minimum: number, maximum: number): number {
     return Math.min(maximum, Math.max(minimum, value))
 }
 
+/** 使用双线性插值采样 RGB 像素。 */
 function sample(
     image: ImageData,
     targetX: number,
@@ -49,6 +50,7 @@ function sample(
     return [channel(0), channel(1), channel(2)]
 }
 
+/** 将原图缩放、归一化为检测模型的 NCHW 张量。 */
 export function createDetectionInput(image: ImageData, config: DetectionConfig): TensorInput {
     const longest = Math.max(image.width, image.height)
     const ratio = Math.min(1, config.maxSideLength / longest)
@@ -79,6 +81,7 @@ export function createDetectionInput(image: ImageData, config: DetectionConfig):
     }
 }
 
+/** 将文字裁剪图缩放并右侧留白为识别模型的 NCHW 张量。 */
 export function createRecognitionInput(image: ImageData, config: RecognitionConfig): TensorInput {
     const contentWidth = Math.min(
         config.maxWidth,

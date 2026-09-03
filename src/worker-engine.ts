@@ -22,6 +22,7 @@ const builtInAssets = {
     wasmModule: '__OCR_SELECT_ASSET__./assets/ocr-select/ort/ort-wasm-simd-threaded.asyncify.mjs',
 }
 
+/** 读取图片源字节并遵循图片元素声明的跨域凭据策略。 */
 async function readImageBytes(image: HTMLImageElement): Promise<ArrayBuffer> {
     const source = image.currentSrc || image.src
     if (!source) throw new Error('Image source is empty')
@@ -36,6 +37,7 @@ function defaultWorkerFactory(): Worker {
     return new Worker(new URL('./ocr.worker.ts', import.meta.url), { type: 'module' })
 }
 
+/** 通过模块 Worker 执行 OCR，并管理在途任务与 Worker 生命周期。 */
 export class WorkerOcrEngine implements OcrEngine {
     readonly #workerFactory: WorkerFactory
     readonly #readImage: ImageReader
@@ -48,6 +50,7 @@ export class WorkerOcrEngine implements OcrEngine {
         this.#readImage = options.readImage ?? readImageBytes
     }
 
+    /** 将图片字节转交给 Worker，并等待关联任务的识别结果。 */
     async recognize(image: HTMLImageElement): Promise<OcrResult> {
         if (this.#disposed) throw new Error('OCR engine has been disposed')
         const bytes = await this.#readImage(image)
@@ -75,6 +78,7 @@ export class WorkerOcrEngine implements OcrEngine {
         })
     }
 
+    /** 拒绝在途任务并终止 Worker。 */
     dispose(): void {
         if (this.#disposed) return
         this.#disposed = true

@@ -21,6 +21,7 @@ function distance(left: Point, right: Point): number {
     return Math.hypot(right[0] - left[0], right[1] - left[1])
 }
 
+/** 将倾斜的 OCR 文本行映射为可由浏览器选中的 SVG 文本元素。 */
 function lineElement(line: OcrTextLine): SVGTextElement {
     const [topLeft, topRight, bottomRight, bottomLeft] = line.box
     const width = (distance(topLeft, topRight) + distance(bottomLeft, bottomRight)) / 2
@@ -44,6 +45,7 @@ function lineIdForNode(node: Node): string | undefined {
     return element?.closest<SVGTextElement>('[data-ocr-line]')?.dataset.ocrLine
 }
 
+/** 将 OCR 结果渲染为 SVG 文本层，并还原浏览器选区中的原始文本。 */
 export class SelectableTextLayer {
     readonly element: SVGSVGElement
     readonly #index: PageTextIndex
@@ -57,6 +59,7 @@ export class SelectableTextLayer {
         for (const line of lines) this.element.append(lineElement(line))
     }
 
+    /** 从本图层的 DOM Range 提取按 OCR 行组织的文本。 */
     textForRange(range: Range): string | undefined {
         const start = this.#position(range.startContainer, range.startOffset, 'start')
         const end = this.#position(range.endContainer, range.endOffset, 'end')
