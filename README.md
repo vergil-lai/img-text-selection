@@ -1,6 +1,6 @@
 # ocr-select-core
 
-不依赖 Vue 的浏览器 OCR 与可选择文字层核心。第一版固定使用内置的 PP-OCRv6 Tiny 模型，不需要配置模型地址或额外部署静态资产。
+面向浏览器的本地 OCR 与可选择文字层核心。第一版固定使用内置的 PP-OCRv6 Tiny 模型，不需要配置模型地址或额外部署静态资产。
 
 `OcrSelectRuntime` 管理 Worker、模型会话、内存缓存和当前活动图片；`OcrSelectBinding` 管理单张图片的生命周期、状态、覆盖层与选择交互。浏览器环境优先使用 WebGPU，并自动回退到 WASM。
 
