@@ -1,6 +1,6 @@
 {
     "name": "ocr-select-core",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -27,15 +27,20 @@
     },
     "scripts": {
         "build": "vite build && tsc -p tsconfig.build.json --pretty false",
+        "commitlint": "commitlint --last --verbose",
         "format": "oxfmt --write .",
         "format:check": "oxfmt --check .",
         "lint": "oxlint .",
+        "prepare": "husky",
         "typecheck": "tsc -b --pretty false",
         "test": "vitest run"
     },
     "devDependencies": {
+        "@commitlint/cli": "20.5.3",
+        "@commitlint/config-conventional": "20.5.3",
         "@types/node": "24.12.4",
         "happy-dom": "20.8.3",
+        "husky": "9.1.7",
         "onnxruntime-web": "1.27.0",
         "oxfmt": "0.65.0",
         "oxlint": "1.80.0",
