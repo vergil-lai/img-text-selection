@@ -1,0 +1,7 @@
+{
+    "categories": {
+        "correctness": "error",
+        "suspicious": "warn"
+    },
+    "ignorePatterns": ["node_modules/**", "dist/**", "demo/**", "runtime-assets/**"]
+}

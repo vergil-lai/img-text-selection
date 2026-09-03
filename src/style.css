@@ -1,0 +1,64 @@
+.ocr-select-host {
+    box-sizing: border-box;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.ocr-select-status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 8px 12px;
+    border-radius: var(--ocr-select-status-radius, 8px);
+    background: var(--ocr-select-status-background, rgb(17 24 39 / 82%));
+    color: var(--ocr-select-status-color, white);
+    font-size: var(--ocr-select-status-font-size, 13px);
+    line-height: 1.4;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+}
+
+.ocr-select-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: var(--ocr-select-status-radius, 8px);
+    background: var(--ocr-select-status-background, rgb(17 24 39 / 82%));
+    color: var(--ocr-select-status-color, white);
+    font-size: var(--ocr-select-status-font-size, 13px);
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+}
+
+.ocr-select-retry {
+    padding: 2px 8px;
+    border: 0;
+    border-radius: 4px;
+    background: white;
+    color: #111827;
+    cursor: pointer;
+    font: inherit;
+}
+
+.ocr-select-text-layer {
+    overflow: visible;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.ocr-select-text-layer text {
+    fill: transparent;
+    stroke: none;
+    cursor: text;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.ocr-select-text-layer text::selection {
+    fill: transparent;
+    background: var(--ocr-select-selection-color, rgb(37 99 235 / 35%));
+}

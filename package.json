@@ -1,0 +1,48 @@
+{
+    "name": "ocr-select-core",
+    "version": "0.1.0",
+    "license": "MIT",
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "type": "module",
+    "sideEffects": [
+        "**/*.css"
+    ],
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./style.css": "./dist/index.css"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "package:build": "vite build && tsc -p tsconfig.build.json --pretty false",
+        "format": "oxfmt --write .",
+        "format:check": "oxfmt --check .",
+        "lint": "oxlint .",
+        "prepublishOnly": "npm run package:build",
+        "release:npm": "npm publish",
+        "typecheck": "tsc -b --pretty false",
+        "test": "vitest run"
+    },
+    "devDependencies": {
+        "@types/node": "24.12.4",
+        "happy-dom": "20.8.3",
+        "onnxruntime-web": "1.27.0",
+        "oxfmt": "0.65.0",
+        "oxlint": "1.80.0",
+        "typescript": "7.0.2",
+        "vite": "8.0.12",
+        "vitest": "4.1.11"
+    },
+    "engines": {
+        "node": ">=20.19.0"
+    },
+    "packageManager": "pnpm@12.0.0"
+}
