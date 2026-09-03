@@ -1,8 +1,9 @@
 name: Publish to npm
 
 on:
-    release:
-        types: [published]
+    push:
+        tags:
+            - 'v*'
 
 permissions:
     contents: read
@@ -20,12 +21,16 @@ jobs:
               with:
                   node-version: 24
                   registry-url: https://registry.npmjs.org
+                  package-manager-cache: false
 
-            - name: Install pnpm
-              run: npm install --global pnpm@12.0.0
+            - name: Install publishing tools
+              run: npm install --global npm@11 pnpm@12.0.0
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
+
+            - name: Verify tag matches package version
+              run: test "$GITHUB_REF_NAME" = "v$(node -p "require('./package.json').version")"
 
             - name: Test
               run: pnpm test
@@ -37,7 +42,7 @@ jobs:
               run: pnpm lint
 
             - name: Build package
-              run: pnpm package:build
+              run: pnpm build
 
             - name: Publish package
               run: npm publish --provenance --access public

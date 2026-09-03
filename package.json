@@ -2,6 +2,10 @@
     "name": "ocr-select-core",
     "version": "0.1.0",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/vergil-lai/ocr-select-core.git"
+    },
     "files": [
         "dist",
         "README.md",
@@ -22,12 +26,10 @@
         "access": "public"
     },
     "scripts": {
-        "package:build": "vite build && tsc -p tsconfig.build.json --pretty false",
+        "build": "vite build && tsc -p tsconfig.build.json --pretty false",
         "format": "oxfmt --write .",
         "format:check": "oxfmt --check .",
         "lint": "oxlint .",
-        "prepublishOnly": "npm run package:build",
-        "release:npm": "npm publish",
         "typecheck": "tsc -b --pretty false",
         "test": "vitest run"
     },
