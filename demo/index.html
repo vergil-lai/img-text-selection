@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ocr-select-core 原生浏览器 OCR 示例" />
+    <title>ocr-select-core demo page</title>
+  </head>
+  <body>
+    <main>
+      <section class="intro-panel" aria-labelledby="page-title">
+        <p class="eyebrow">一张图片，一层可复制的文字</p>
+        <h1 id="page-title">识别之后，<em>直接选择。</em></h1>
+        <p class="intro">
+          点击票据，OCR
+          在当前浏览器运行。完成后像操作普通网页文字一样拖选、复制。
+        </p>
+      </section>
+
+      <div class="scan-bar" aria-label="识别状态和操作">
+        <span class="scan-dot" aria-hidden="true"></span>
+        <span id="status" class="status" data-status="idle"
+          >点击票据开始识别</span
+        >
+      </div>
+
+      <section class="document" aria-label="可识别的示例票据">
+        <img id="document" alt="包含中英文价格与功能说明的示例图片" />
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
