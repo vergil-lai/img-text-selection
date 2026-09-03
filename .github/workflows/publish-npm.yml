@@ -32,6 +32,9 @@ jobs:
             - name: Verify tag matches package version
               run: test "$GITHUB_REF_NAME" = "v$(node -p "require('./package.json').version")"
 
+            - name: Build package
+              run: pnpm build
+
             - name: Test
               run: pnpm test
 
@@ -40,9 +43,6 @@ jobs:
 
             - name: Lint
               run: pnpm lint
-
-            - name: Build package
-              run: pnpm build
 
             - name: Publish package
               run: npm publish --provenance --access public
