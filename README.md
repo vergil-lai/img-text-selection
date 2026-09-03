@@ -23,3 +23,16 @@ const binding = runtime.attach(document.querySelector('img')!)
 
 await binding.activate()
 ```
+
+## 运行 Demo
+
+```bash
+cd demo
+pnpm install
+pnpm dev
+```
+
+打开终端输出的本地地址，点击示例图片即可启动 OCR；识别完成后可直接拖选、复制图片中的文字。
+
+## LICENCE
+[MIT](./LICENSE)

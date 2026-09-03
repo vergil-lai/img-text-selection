@@ -1,6 +1,7 @@
 node_modules/
 /dist/
 *.tsbuildinfo
+pnpm-lock.yaml
 
 .DS_Store
 .vscode
