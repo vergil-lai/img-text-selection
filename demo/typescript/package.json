@@ -1,5 +1,5 @@
 {
-  "name": "ocr-select-core-demo",
+  "name": "img-text-selection-typescript-demo",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,7 +8,7 @@
     "dev": "vite"
   },
   "dependencies": {
-    "ocr-select-core": "^0.1.0"
+    "img-text-selection": "file:../.."
   },
   "devDependencies": {
     "@types/node": "24.12.4",

@@ -1,5 +1,5 @@
-import { createOcrSelect, type OcrSelectState } from 'ocr-select-core'
-import 'ocr-select-core/style.css'
+import { createOcrSelect, type OcrSelectState } from 'img-text-selection'
+import 'img-text-selection/style.css'
 import sampleUrl from './sample.png'
 import './style.css'
 

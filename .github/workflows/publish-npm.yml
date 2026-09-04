@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish img-text-selection to npm
 
 on:
     push:
@@ -7,7 +7,6 @@ on:
 
 permissions:
     contents: read
-    id-token: write
 
 jobs:
     publish:
@@ -32,6 +31,9 @@ jobs:
             - name: Verify tag matches package version
               run: test "$GITHUB_REF_NAME" = "v$(node -p "require('./package.json').version")"
 
+            - name: Verify package identity
+              run: test "$(node -p "require('./package.json').name")" = "img-text-selection"
+
             - name: Build package
               run: pnpm build
 
@@ -45,4 +47,6 @@ jobs:
               run: pnpm lint
 
             - name: Publish package
-              run: npm publish --provenance --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: npm publish --access public

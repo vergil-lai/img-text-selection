@@ -47,9 +47,16 @@ export default defineConfig({
     },
     build: {
         lib: {
-            entry: resolve(import.meta.dirname, 'src/index.ts'),
+            entry: {
+                index: resolve(import.meta.dirname, 'src/index.ts'),
+                'vue/directive': resolve(import.meta.dirname, 'src/vue/directive.ts'),
+            },
             formats: ['es'],
-            fileName: 'index',
+            fileName: (_format, entryName) => `${entryName}.js`,
+            cssFileName: 'index',
+        },
+        rolldownOptions: {
+            external: ['vue'],
         },
         sourcemap: true,
         minify: false,

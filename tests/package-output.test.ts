@@ -5,8 +5,23 @@ import { resolve } from 'node:path'
 import { describe, expect, test } from 'vitest'
 
 const distAssets = resolve(import.meta.dirname, '../dist/assets')
+const distRoot = resolve(import.meta.dirname, '../dist')
 
 describe('npm package output', () => {
+    test('exposes the Vue directive as a separate subpath without bundling Vue', async () => {
+        const source = await readFile(
+            resolve(import.meta.dirname, '../dist/vue/directive.js'),
+            'utf8',
+        )
+        const declarations = await readFile(
+            resolve(import.meta.dirname, '../dist/vue/directive.d.ts'),
+            'utf8',
+        )
+
+        expect(source).not.toContain("from 'vue'")
+        expect(declarations).toContain("from 'vue'")
+    })
+
     test('ships Tiny and ONNX Runtime assets as files beside the worker', async () => {
         const requiredAssets = [
             'ocr-select/tiny/det.onnx',
@@ -31,10 +46,20 @@ describe('npm package output', () => {
         expect(source.includes('data:application/octet-stream;base64')).toBe(false)
         expect(source.includes('new URL("./ocr-select/tiny/det.onnx"')).toBe(false)
 
-        const entry = await readFile(resolve(import.meta.dirname, '../dist/index.js'), 'utf8')
-        expect(entry.includes('data:application/octet-stream;base64')).toBe(false)
+        const chunks = await Promise.all(
+            (await import('node:fs/promises').then(({ readdir }) => readdir(distRoot)))
+                .filter((file) => file.endsWith('.js'))
+                .map((file) => readFile(resolve(distRoot, file), 'utf8')),
+        )
         expect(
-            entry.includes('new URL("./assets/ocr-select/tiny/det.onnx", import.meta.url).href'),
+            chunks.every((chunk) => !chunk.includes('data:application/octet-stream;base64')),
+        ).toBe(true)
+        expect(
+            chunks.some((chunk) =>
+                chunk.includes(
+                    'new URL("./assets/ocr-select/tiny/det.onnx", import.meta.url).href',
+                ),
+            ),
         ).toBe(true)
     })
 })
