@@ -37,10 +37,8 @@ npm install img-text-selection
 import { createOcrSelect, type OcrSelectState } from 'img-text-selection'
 import 'img-text-selection/style.css'
 
-const image = document.querySelector<HTMLImageElement>('#document')!
-
 const runtime = createOcrSelect()
-const binding = runtime.attach(image)
+const binding = runtime.attach('#document') // 传 CSS 选择器或 HTMLImageElement 均可
 
 // 订阅状态变化（立即收到当前状态）
 const unsubscribe = binding.subscribe((state: OcrSelectState) => {
@@ -108,12 +106,8 @@ function onStateChange(next: OcrSelectState): void {
 </script>
 
 <template>
-  <p aria-live="polite">{{ label }}</p>
-  <img
-    v-img-text-selection="{ onStateChange }"
-    src="/document.png"
-    alt="Document"
-  />
+    <p aria-live="polite">{{ label }}</p>
+    <img v-img-text-selection="{ onStateChange }" src="/document.png" alt="Document" />
 </template>
 ```
 
@@ -127,30 +121,30 @@ function onStateChange(next: OcrSelectState): void {
 
 ### `OcrSelectRuntime`
 
-| 成员 | 说明 |
-| --- | --- |
-| `attach(image: HTMLImageElement): OcrSelectBinding` | 绑定一张图片；可绑定多张，同一时刻仅一张处于激活态 |
-| `dispose(): Promise<void>` | 释放所有绑定并终止 Worker |
+| 成员                                                           | 说明                                                                                                  |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `attach(target: HTMLImageElement \| string): OcrSelectBinding` | 绑定一张图片；目标可传元素或任意 CSS 选择器（匹配首个 `<img>`），可绑定多张，同一时刻仅一张处于激活态 |
+| `dispose(): Promise<void>`                                     | 释放所有绑定并终止 Worker                                                                             |
 
 ### `OcrSelectBinding`
 
-| 成员 | 说明 |
-| --- | --- |
-| `state: OcrSelectState` | 当前状态（只读） |
-| `activate(): Promise<void>` | 激活文字层；命中缓存时直接呈现，跳过识别 |
-| `deactivate(): void` | 收起文字层并回到 `idle` |
+| 成员                              | 说明                                             |
+| --------------------------------- | ------------------------------------------------ |
+| `state: OcrSelectState`           | 当前状态（只读）                                 |
+| `activate(): Promise<void>`       | 激活文字层；命中缓存时直接呈现，跳过识别         |
+| `deactivate(): void`              | 收起文字层并回到 `idle`                          |
 | `subscribe(listener): () => void` | 订阅状态变化并立即收到当前状态，返回取消订阅函数 |
-| `dispose(): void` | 解绑图片并清理该绑定的全部资源 |
+| `dispose(): void`                 | 解绑图片并清理该绑定的全部资源                   |
 
 ### `OcrSelectState`
 
-| 状态 | 附加字段 | 说明 |
-| --- | --- | --- |
-| `idle` | — | 初始态，等待用户点击图片 |
-| `recognizing` | — | Worker 正在执行 OCR |
-| `active` | `backend: 'webgpu' \| 'wasm'` | 文字层就绪，可拖选、复制 |
-| `error` | `error: unknown` | 识别失败，覆盖层提供「重试」按钮 |
-| `disposed` | — | 绑定已释放 |
+| 状态          | 附加字段                      | 说明                             |
+| ------------- | ----------------------------- | -------------------------------- |
+| `idle`        | —                             | 初始态，等待用户点击图片         |
+| `recognizing` | —                             | Worker 正在执行 OCR              |
+| `active`      | `backend: 'webgpu' \| 'wasm'` | 文字层就绪，可拖选、复制         |
+| `error`       | `error: unknown`              | 识别失败，覆盖层提供「重试」按钮 |
+| `disposed`    | —                             | 绑定已释放                       |
 
 ### 交互行为
 

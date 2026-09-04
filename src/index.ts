@@ -10,4 +10,4 @@ export function createOcrSelect(): OcrSelectRuntime {
 }
 
 export { OcrSelectBinding, OcrSelectRuntime } from './runtime'
-export type { OcrBackend, OcrLine, OcrResult, OcrSelectState } from './runtime'
+export type { OcrBackend, OcrLine, OcrResult, OcrSelectState, OcrSelectTarget } from './runtime'

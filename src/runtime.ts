@@ -39,6 +39,22 @@ interface RuntimeOptions {
     engine: OcrEngine
 }
 
+/** attach 支持的绑定目标：图片元素或任意 CSS 选择器。 */
+export type OcrSelectTarget = HTMLImageElement | string
+
+/** 将绑定目标解析为图片元素；字符串按 CSS 选择器匹配首个结果。 */
+function resolveImage(target: OcrSelectTarget): HTMLImageElement {
+    if (typeof target !== 'string') return target
+    const element = document.querySelector(target)
+    if (!element) throw new Error(`No element matches the selector "${target}"`)
+    if (!(element instanceof HTMLImageElement)) {
+        throw new Error(
+            `Selector "${target}" matched a <${element.tagName.toLowerCase()}> element, expected an <img>`,
+        )
+    }
+    return element
+}
+
 /** 生成可用于 OCR 结果缓存的图片内容标识。 */
 function identityOf(image: HTMLImageElement): string {
     return `${image.currentSrc || image.src}\u0000${image.naturalWidth}x${image.naturalHeight}`
@@ -371,10 +387,10 @@ export class OcrSelectRuntime {
         this.#engine = options.engine
     }
 
-    /** 为图片创建独立的 OCR 绑定。 */
-    attach(image: HTMLImageElement): OcrSelectBinding {
+    /** 为图片创建独立的 OCR 绑定；目标可传图片元素或 CSS 选择器。 */
+    attach(target: OcrSelectTarget): OcrSelectBinding {
         if (this.#disposed) throw new Error('OCR runtime has been disposed')
-        const binding = new OcrSelectBinding(this, image)
+        const binding = new OcrSelectBinding(this, resolveImage(target))
         this.#bindings.add(binding)
         return binding
     }

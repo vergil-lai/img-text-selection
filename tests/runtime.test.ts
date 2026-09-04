@@ -116,6 +116,39 @@ describe('OcrSelectRuntime', () => {
         await runtime.dispose()
     })
 
+    test('attaches an image via a CSS selector', async () => {
+        const engine: OcrEngine = { recognize: vi.fn(async () => result), dispose: vi.fn() }
+        const runtime = new OcrSelectRuntime({ engine })
+        const element = image('data:image/png;base64,selector')
+        element.id = 'document'
+
+        const binding = runtime.attach('#document')
+        await binding.activate()
+
+        expect(binding.image).toBe(element)
+        expect(engine.recognize).toHaveBeenCalledWith(element)
+        await runtime.dispose()
+    })
+
+    test('throws when a CSS selector matches no element', () => {
+        const runtime = new OcrSelectRuntime({ engine: { recognize: vi.fn(), dispose: vi.fn() } })
+
+        expect(() => runtime.attach('#missing')).toThrowError(
+            'No element matches the selector "#missing"',
+        )
+    })
+
+    test('throws when a CSS selector matches a non-image element', () => {
+        const runtime = new OcrSelectRuntime({ engine: { recognize: vi.fn(), dispose: vi.fn() } })
+        const div = document.createElement('div')
+        div.id = 'not-an-image'
+        document.body.append(div)
+
+        expect(() => runtime.attach('#not-an-image')).toThrowError(
+            'Selector "#not-an-image" matched a <div> element, expected an <img>',
+        )
+    })
+
     test('shows an inline retry action after recognition fails', async () => {
         const recognize = vi
             .fn<() => Promise<OcrResult>>()
