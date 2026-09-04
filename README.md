@@ -34,40 +34,40 @@ npm install img-text-selection
 ### 原生 TypeScript / JavaScript
 
 ```ts
-import { createOcrSelect, type OcrSelectState } from 'img-text-selection'
-import 'img-text-selection/style.css'
+import { createOcrSelect, type OcrSelectState } from 'img-text-selection';
+import 'img-text-selection/style.css';
 
-const runtime = createOcrSelect()
-const binding = runtime.attach('#document') // 传 CSS 选择器或 HTMLImageElement 均可
+const runtime = createOcrSelect();
+const binding = runtime.attach('#document'); // 传 CSS 选择器或 HTMLImageElement 均可
 
 // 订阅状态变化（立即收到当前状态）
 const unsubscribe = binding.subscribe((state: OcrSelectState) => {
     switch (state.status) {
         case 'idle':
-            console.log('等待用户点击图片')
-            break
+            console.log('等待用户点击图片');
+            break;
         case 'recognizing':
-            console.log('正在识别…')
-            break
+            console.log('正在识别…');
+            break;
         case 'active':
-            console.log(`文字层就绪 · ${state.backend.toUpperCase()}`) // webgpu | wasm
-            break
+            console.log(`文字层就绪 · ${state.backend.toUpperCase()}`); // webgpu | wasm
+            break;
         case 'error':
-            console.error('识别失败', state.error)
-            break
+            console.error('识别失败', state.error);
+            break;
         case 'disposed':
-            console.log('绑定已释放')
-            break
+            console.log('绑定已释放');
+            break;
     }
-})
+});
 
 // 主动激活文字层；也可以什么都不做，等用户点击图片自动触发
-await binding.activate()
+await binding.activate();
 
 // 页面卸载时清理
-unsubscribe()
-binding.dispose()
-await runtime.dispose()
+unsubscribe();
+binding.dispose();
+await runtime.dispose();
 ```
 
 ### Vue 3 指令
@@ -77,31 +77,31 @@ Vue 适配层由同一个包的 `./vue` 子路径提供；Vue 3.5+ 是 optional 
 在应用入口注册插件（同一个 app 内的所有实例共享一个 runtime，app 卸载时自动释放）：
 
 ```ts
-import { createApp } from 'vue'
-import { createOcrSelectPlugin } from 'img-text-selection/vue'
-import 'img-text-selection/style.css'
-import App from './App.vue'
+import { createApp } from 'vue';
+import { createOcrSelectPlugin } from 'img-text-selection/vue';
+import 'img-text-selection/style.css';
+import App from './App.vue';
 
-createApp(App).use(createOcrSelectPlugin()).mount('#app')
+createApp(App).use(createOcrSelectPlugin()).mount('#app');
 ```
 
 在组件中把指令放在原生 `<img>` 上：
 
 ```vue
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { OcrSelectState } from 'img-text-selection/vue'
+import { computed, ref } from 'vue';
+import type { OcrSelectState } from 'img-text-selection/vue';
 
-const state = ref<OcrSelectState>({ status: 'idle' })
+const state = ref<OcrSelectState>({ status: 'idle' });
 const label = computed(() => {
-    if (state.value.status === 'recognizing') return '正在识别…'
-    if (state.value.status === 'active') return '可选择文字'
-    if (state.value.status === 'error') return '识别失败'
-    return '点击图片开始识别'
-})
+    if (state.value.status === 'recognizing') return '正在识别…';
+    if (state.value.status === 'active') return '可选择文字';
+    if (state.value.status === 'error') return '识别失败';
+    return '点击图片开始识别';
+});
 
 function onStateChange(next: OcrSelectState): void {
-    state.value = next
+    state.value = next;
 }
 </script>
 

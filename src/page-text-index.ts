@@ -1,72 +1,72 @@
 export interface TextLineInput {
-    id: string
-    text: string
+    id: string;
+    text: string;
 }
 
 export interface TextPosition {
-    lineId: string
-    grapheme: number
+    lineId: string;
+    grapheme: number;
 }
 
 export interface IndexedTextLine extends TextLineInput {
-    graphemes: string[]
-    utf16Offsets: number[]
+    graphemes: string[];
+    utf16Offsets: number[];
 }
 
 /** 将页面 OCR 行索引为字素簇，以正确处理 Unicode 文本选区。 */
 export class PageTextIndex {
-    readonly #lines: IndexedTextLine[]
-    readonly #byId: Map<string, IndexedTextLine>
+    readonly #lines: IndexedTextLine[];
+    readonly #byId: Map<string, IndexedTextLine>;
 
     constructor(lines: readonly TextLineInput[]) {
-        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+        const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
         this.#lines = lines.map((line) => {
-            const segments = [...segmenter.segment(line.text)]
+            const segments = [...segmenter.segment(line.text)];
             return {
                 ...line,
                 graphemes: segments.map((segment) => segment.segment),
                 utf16Offsets: [...segments.map((segment) => segment.index), line.text.length],
-            }
-        })
-        this.#byId = new Map(this.#lines.map((line) => [line.id, line]))
+            };
+        });
+        this.#byId = new Map(this.#lines.map((line) => [line.id, line]));
     }
 
     /** 按行 ID 获取已分词的文本行。 */
     line(id: string): IndexedTextLine {
-        const line = this.#byId.get(id)
-        if (!line) throw new RangeError(`Unknown text line: ${id}`)
-        return line
+        const line = this.#byId.get(id);
+        if (!line) throw new RangeError(`Unknown text line: ${id}`);
+        return line;
     }
 
     /** 将 DOM 的 UTF-16 偏移量映射为稳定的字素簇位置。 */
     positionAtUtf16(lineId: string, offset: number, affinity: 'start' | 'end'): TextPosition {
-        const line = this.line(lineId)
-        const bounded = Math.max(0, Math.min(offset, line.text.length))
-        const exact = line.utf16Offsets.indexOf(bounded)
-        if (exact >= 0) return { lineId, grapheme: exact }
+        const line = this.line(lineId);
+        const bounded = Math.max(0, Math.min(offset, line.text.length));
+        const exact = line.utf16Offsets.indexOf(bounded);
+        if (exact >= 0) return { lineId, grapheme: exact };
 
-        const next = line.utf16Offsets.findIndex((candidate) => candidate > bounded)
+        const next = line.utf16Offsets.findIndex((candidate) => candidate > bounded);
         return {
             lineId,
             grapheme: affinity === 'start' ? Math.max(0, next - 1) : next,
-        }
+        };
     }
 
     /** 返回按页面阅读顺序包含首尾位置的选中文本。 */
     textBetween(start: TextPosition, end: TextPosition): string {
-        const startIndex = this.#lines.findIndex((line) => line.id === start.lineId)
-        const endIndex = this.#lines.findIndex((line) => line.id === end.lineId)
+        const startIndex = this.#lines.findIndex((line) => line.id === start.lineId);
+        const endIndex = this.#lines.findIndex((line) => line.id === end.lineId);
         if (startIndex < 0 || endIndex < 0 || startIndex > endIndex) {
-            throw new RangeError('Text range must follow page order')
+            throw new RangeError('Text range must follow page order');
         }
 
         return this.#lines
             .slice(startIndex, endIndex + 1)
             .map((line, index, selected) => {
-                const from = index === 0 ? start.grapheme : 0
-                const to = index === selected.length - 1 ? end.grapheme : line.graphemes.length
-                return line.graphemes.slice(from, to).join('')
+                const from = index === 0 ? start.grapheme : 0;
+                const to = index === selected.length - 1 ? end.grapheme : line.graphemes.length;
+                return line.graphemes.slice(from, to).join('');
             })
-            .join('\n')
+            .join('\n');
     }
 }
